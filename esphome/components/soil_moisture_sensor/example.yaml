@@ -1,0 +1,46 @@
+esphome:
+  name: esp32-soil-moisture-sensor-01 # Unique name for the ESPHome device
+  friendly_name: Soil-Moisture-Sensor-01 # Human-readable name
+  platformio_options:
+    lib_deps:
+    - "TickTwo" # Include the TickTwo library
+
+esp32:
+  board: esp32-c3-devkitm-1 # Specify the ESP32 board being used
+  framework:
+    type: arduino # Use the Arduino framework for ESP32
+
+# Enable logging
+logger: # Enables logging for debugging
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "" # Encrypt the API communication with a generated key
+
+ota:
+  - platform: esphome
+    password: "" # Password for over-the-air updates
+
+wifi:
+  ssid: !secret wifi_ssid # Load Wi-Fi SSID from secrets file
+  password: !secret wifi_password # Load Wi-Fi password from secrets file
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Esp32-Soil-Moisture-Sensor" # SSID for the fallback hotspot
+    password: "" # Password for the fallback hotspot
+
+captive_portal: # Enables the captive portal for easy Wi-Fi configuration
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/makszimilien/ESP32-Soil-Moisture-Sensor.git
+      ref: main
+    components: [soil_moisture_sensor]
+
+sensor:
+  - platform: soil_moisture_sensor # Use the custom soil moisture sensor platform
+    name: Soil Moisture Sensor 01 # Name of the sensor entity in Home Assistant
+    id: soil_moisture_sensor_01 # Internal ID of the sensor

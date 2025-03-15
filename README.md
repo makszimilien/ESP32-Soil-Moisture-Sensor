@@ -1,2 +1,3 @@
 # ESP32-Soil-Moisture-Sensor
-ESPHome external component for an ESP32 soil moisture sensor. Enables Home Assistant integration with real-time monitoring.
+This ESPHome external component is specially designed for converting a Hydrofoil Controller board 
+to a Soil Moisture Sensor. It enables Home Assistant integration with real-time monitoring.
