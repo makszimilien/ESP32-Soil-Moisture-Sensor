@@ -34,7 +34,7 @@ void SoilMoistureSensor::setup() {
 
   // Set up ticker for measurement
   measurementTicker =
-      new TickTwo([this]() { this->startMeasurement(); }, 100, 0,
+      new TickTwo([this]() { this->startMeasurement(); }, 20, 0,
                   MILLIS); // Create a TickTwo timer to trigger measurements
                            // every 100 milliseconds
 
@@ -77,7 +77,7 @@ void SoilMoistureSensor::startMeasurement() {
   interrupts();                    // Enable interrupts
 
   rawValues.push_back(rawValue); // Add the raw value to the vector
-  if (rawValues.size() > 20) {   // If the vector has more than 20 elements
+  if (rawValues.size() > 100) {  // If the vector has more than 20 elements
     rawValues.erase(rawValues.begin()); // Remove the oldest element to keep the
                                         // vector size limited
   }
