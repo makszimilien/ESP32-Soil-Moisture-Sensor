@@ -29,8 +29,6 @@ void SoilMoistureSensor::setup() {
   // Set up timers for capacitance measurement
   timer = timerBegin(
       0, 2, true); // Initialize hardware timer with prescaler 2 and auto-reload
-  Serial.println("Measurement timer has been set"); // Print a message to the
-                                                    // serial monitor
 
   // Set up ticker for measurement
   measurementTicker =
