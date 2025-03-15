@@ -90,9 +90,11 @@ int SoilMoistureSensor::calculateMoisture() {
   }
 
   median = getMedian(rawValues); // Calculate the median of the raw values
-  soilMoisture = map(median, 800, 4000, 0,
+  soilMoisture = map(median, 800, 18000, 0,
                      100); // Map the median value to a moisture percentage
                            // (0-100) using linear interpolation
+  soilMoisture =
+      constrain(soilMoisture, 0, 100); // Ensure value stays within 0-100
 
   return soilMoisture; // Return the calculated moisture percentage
 }
