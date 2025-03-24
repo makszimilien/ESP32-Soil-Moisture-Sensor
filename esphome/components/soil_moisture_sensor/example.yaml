@@ -47,5 +47,5 @@ sensor:
     update_interval: 1s  # Set the desired interval here
 
 deep_sleep: # Set up deep-sleep functionalty
-  run_duration: 10s
+  run_duration: 10s # Set this to a longer duration initially for easier setup in Home Assistant
   sleep_duration: 1min
