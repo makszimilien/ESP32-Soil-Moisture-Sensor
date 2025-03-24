@@ -16,7 +16,7 @@ std::vector<int>
     rawValues;            // Vector to store raw capacitance measurement values
 hw_timer_t *timer = NULL; // Hardware timer pointer
 int median = 0;           // Variable to store the median of raw values
-int soilMoisture = 200;   // Variable to store the calculated soil moisture
+int soilMoisture = 0;     // Variable to store the calculated soil moisture
                           // percentage, initialized to a default value.
 
 static const char *TAG =
@@ -32,7 +32,7 @@ void SoilMoistureSensor::setup() {
 
   // Set up ticker for measurement
   measurementTicker =
-      new TickTwo([this]() { this->startMeasurement(); }, 20, 0,
+      new TickTwo([this]() { this->startMeasurement(); }, 10, 0,
                   MILLIS); // Create a TickTwo timer to trigger measurements
                            // every 100 milliseconds
 
@@ -75,7 +75,7 @@ void SoilMoistureSensor::startMeasurement() {
   interrupts();                    // Enable interrupts
 
   rawValues.push_back(rawValue); // Add the raw value to the vector
-  if (rawValues.size() > 100) {  // If the vector has more than 20 elements
+  if (rawValues.size() > 50) {   // If the vector has more than 50 elements
     rawValues.erase(rawValues.begin()); // Remove the oldest element to keep the
                                         // vector size limited
   }
@@ -84,7 +84,7 @@ void SoilMoistureSensor::startMeasurement() {
 // Calculate water level from measurement
 int SoilMoistureSensor::calculateMoisture() {
   if (rawValues.size() == 0) { // If no raw values are available
-    return 200;                // Return a default value
+    return 0;                  // Return a default value
   }
 
   median = getMedian(rawValues); // Calculate the median of the raw values
