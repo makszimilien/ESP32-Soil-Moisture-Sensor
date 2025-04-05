@@ -11,7 +11,8 @@ esp32:
     type: arduino # Use the Arduino framework for ESP32
 
 # Enable logging
-logger: # Enables logging for debugging
+logger:
+  level: NONE # Turn off debugging
 
 # Enable Home Assistant API
 api:
@@ -44,8 +45,9 @@ sensor:
   - platform: soil_moisture_sensor # Use the custom soil moisture sensor platform
     name: Soil Moisture Sensor 01 # Name of the sensor entity in Home Assistant
     id: soil_moisture_sensor_01 # Internal ID of the sensor
-    update_interval: 2s  # Set the desired interval here
+    update_interval: 3s  # Set the desired interval here
 
-deep_sleep: # Set up deep-sleep functionalty
-  run_duration: 15s # Set this to a longer duration initially for easier setup in Home Assistant
-  sleep_duration: 15s
+# Set up deep-sleep functionalty to increase battery life time
+#deep_sleep: 
+#  run_duration: 15s # Set this to a longer duration initially for easier setup in Home Assistant
+#  sleep_duration: 60s
