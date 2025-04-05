@@ -10,9 +10,9 @@ esp32:
   framework:
     type: arduino # Use the Arduino framework for ESP32
 
-# Enable logging
+# Set up logging
 logger:
-  level: NONE # Turn off debugging
+  level: NONE # Turn off logging 
 
 # Enable Home Assistant API
 api:
@@ -48,6 +48,6 @@ sensor:
     update_interval: 3s  # Set the desired interval here
 
 # Set up deep-sleep functionalty to increase battery life time
-#deep_sleep: 
-#  run_duration: 15s # Set this to a longer duration initially for easier setup in Home Assistant
-#  sleep_duration: 60s
+deep_sleep: 
+  run_duration: 15s # Set this to a longer duration initially for easier setup in Home Assistant
+  sleep_duration: 15s
