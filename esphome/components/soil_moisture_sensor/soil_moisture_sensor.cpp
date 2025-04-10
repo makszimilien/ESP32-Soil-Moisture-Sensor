@@ -1,30 +1,28 @@
-#include "esphome/core/log.h" // Include ESPHome logging functionality
-#include "soil_moisture_sensor.h" // Include the header file for this custom component
-#include <Arduino.h>              // Include Arduino core functions
-#include <TickTwo.h> // Include TickTwo library for non-blocking timers
-#include <vector>    // Include vector library for dynamic arrays
+#include "esphome/core/log.h"
+#include "soil_moisture_sensor.h"
+#include <Arduino.h>
+#include <TickTwo.h>
+#include <vector>
 
 namespace esphome {
 namespace soil_moisture_sensor {
 
 // Define pins for various functions
-const int capacitancePin =
-    GPIO_NUM_6; // Define the GPIO pin used for capacitance measurement
+const int capacitancePin = GPIO_NUM_6;
 
 // Capacitance measurement
 std::vector<int>
     rawValues;            // Vector to store raw capacitance measurement values
 hw_timer_t *timer = NULL; // Hardware timer pointer
-int median = 0;           // Variable to store the median of raw values
-int soilMoisture = 0;     // Variable to store the calculated soil moisture
-                          // percentage, initialized to a default value.
+int median = 0;
+int soilMoisture = 0;
 
 static const char *TAG =
     "soil_moisture_sensor.sensor"; // Define a tag for logging
 
 void SoilMoistureSensor::setup() {
   // Configure pin modes
-  pinMode(capacitancePin, INPUT); // Configure the capacitance pin as input
+  pinMode(capacitancePin, INPUT);
 
   // Set up timers for capacitance measurement
   timer = timerBegin(
@@ -32,23 +30,26 @@ void SoilMoistureSensor::setup() {
 
   // Set up ticker for measurement
   measurementTicker =
-      new TickTwo([this]() { this->startMeasurement(); }, 10, 0,
-                  MILLIS); // Create a TickTwo timer to trigger measurements
-                           // every 100 milliseconds
+      new TickTwo([this]() { this->startMeasurement(); }, 10, 0, MILLIS);
 
-  measurementTicker->start(); // Start the TickTwo timer
+  measurementTicker->start();
+
+  // Set up ticker for calculating moisture
+  moistureCalculationTicker =
+      new TickTwo([this]() { this->calculateMoisture(); }, 600, 0, MILLIS);
+
+  moistureCalculationTicker->start();
 }
 
 void SoilMoistureSensor::loop() {
   measurementTicker->update();
-} // Update the TickTwo timer in the main loop
+  moistureCalculationTicker->update();
+}
 
-void SoilMoistureSensor::update() {
-  publish_state(calculateMoisture());
-} // Update the sensor state with the calculated moisture value
+void SoilMoistureSensor::update() { publish_state(soilMoisture); }
 
 void SoilMoistureSensor::dump_config() {
-  ESP_LOGCONFIG(TAG, "Soil Moisture Sensor"); // Log the component configuration
+  ESP_LOGCONFIG(TAG, "Soil Moisture Sensor");
 }
 
 int SoilMoistureSensor::getMedian(const std::vector<int> &values) {
@@ -60,11 +61,11 @@ int SoilMoistureSensor::getMedian(const std::vector<int> &values) {
 
 // Start charge up time measurement
 void SoilMoistureSensor::startMeasurement() {
-  pinMode(capacitancePin, OUTPUT); // Set the capacitance pin as output
+  pinMode(capacitancePin, OUTPUT);
   digitalWrite(capacitancePin,
-               LOW);     // Set the pin low to discharge the capacitor
-  delayMicroseconds(50); // Delay for a short time
-  noInterrupts();        // Disable interrupts to ensure accurate timing
+               LOW); // Set the pin low to discharge the capacitor
+  delayMicroseconds(50);
+  noInterrupts(); // Disable interrupts to ensure accurate timing
   pinMode(capacitancePin,
           INPUT);      // Set the pin back to input to measure charge time
   timerRestart(timer); // Restart the hardware timer
@@ -76,15 +77,15 @@ void SoilMoistureSensor::startMeasurement() {
 
   rawValues.push_back(rawValue); // Add the raw value to the vector
   if (rawValues.size() > 50) {   // If the vector has more than 50 elements
-    rawValues.erase(rawValues.begin()); // Remove the oldest element to keep the
-                                        // vector size limited
+    rawValues.erase(rawValues.begin()); // Remove the oldest element
   }
 };
 
-// Calculate water level from measurement
-int SoilMoistureSensor::calculateMoisture() {
-  if (rawValues.size() == 0) { // If no raw values are available
-    return 0;                  // Return a default value
+// Calculate soil moisture from measurement
+void SoilMoistureSensor::calculateMoisture() {
+  if (rawValues.size() == 0) {
+    soilMoisture = 0; // If no raw values are available
+    return;           // Return a default value
   }
 
   median = getMedian(rawValues); // Calculate the median of the raw values
@@ -93,8 +94,6 @@ int SoilMoistureSensor::calculateMoisture() {
                            // (0-100) using linear interpolation
   soilMoisture =
       constrain(soilMoisture, 0, 100); // Ensure value stays within 0-100
-
-  return soilMoisture; // Return the calculated moisture percentage
 }
 
 } // namespace soil_moisture_sensor

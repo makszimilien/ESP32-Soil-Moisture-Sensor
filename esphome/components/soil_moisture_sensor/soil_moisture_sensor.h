@@ -17,8 +17,9 @@ public:
 private:
   int getMedian(const std::vector<int> &values);
   void startMeasurement();
-  int calculateMoisture();
+  void calculateMoisture();
   TickTwo *measurementTicker;
+  TickTwo *moistureCalculationTicker;
 };
 
 } // namespace soil_moisture_sensor
